@@ -1,0 +1,38 @@
+[
+  {
+    "ParameterKey": "StateMachineRoleArn",
+    "ParameterValue": "arn:aws:iam::<SEU_ID_DE_CONTA>:role/StepFunctions-PixWorkflow-Role"
+  },
+  {
+    "ParameterKey": "ValidarSolicitacaoLambdaArn",
+    "ParameterValue": "arn:aws:lambda:sa-east-1:<SEU_ID_DE_CONTA>:function:ValidarSolicitacaoLambda"
+  },
+  {
+    "ParameterKey": "ChecarSaldoLambdaArn",
+    "ParameterValue": "arn:aws:lambda:sa-east-1:<SEU_ID_DE_CONTA>:function:ChecarSaldoLambda"
+  },
+  {
+    "ParameterKey": "DeduzirSaldoLambdaArn",
+    "ParameterValue": "arn:aws:lambda:sa-east-1:<SEU_ID_DE_CONTA>:function:DeduzirSaldoLambda"
+  },
+  {
+    "ParameterKey": "ExecutarPixLambdaArn",
+    "ParameterValue": "arn:aws:lambda:sa-east-1:<SEU_ID_DE_CONTA>:function:ExecutarPixLambda"
+  },
+  {
+    "ParameterKey": "EstornarSaldoLambdaArn",
+    "ParameterValue": "arn:aws:lambda:sa-east-1:<SEU_ID_DE_CONTA>:function:EstornarSaldoLambda"
+  },
+  {
+    "ParameterKey": "NotificarClienteLambdaArn",
+    "ParameterValue": "arn:aws:lambda:sa-east-1:<SEU_ID_DE_CONTA>:function:NotificarClienteLambda"
+  },
+  {
+    "ParameterKey": "RegistrarFalhaLambdaArn",
+    "ParameterValue": "arn:aws:lambda:sa-east-1:<SEU_ID_DE_CONTA>:function:RegistrarFalhaLambda"
+  },
+  {
+    "ParameterKey": "RegistrarTransacaoLambdaArn",
+    "ParameterValue": "arn:aws:lambda:sa-east-1:<SEU_ID_DE_CONTA>:function:RegistrarTransacaoLambda"
+  }
+]
