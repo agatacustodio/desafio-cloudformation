@@ -1,6 +1,6 @@
 # Pix Transaction Workflow - AWS CloudFormation
 
-Este repositório contém um template AWS CloudFormation que define uma **Máquina de Estados (Step Functions)** para orquestrar um fluxo de transação financeira, como um pagamento Pix, garantindo a atomicidade e a resiliência das etapas.
+Este repositório contém um template AWS CloudFormation que define uma **Máquina de Estados (Step Functions)** para orquestrar o fluxo de transação financeira de um Cash Out via Pix.
 
 ## O que é o AWS CloudFormation?
 
