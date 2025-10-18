@@ -1,0 +1,146 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Fluxo de Transação (Ex: Pix) Orquestrado pelo AWS Step Functions e AWS Lambda.'
+
+Parameters:
+  StateMachineRoleArn:
+    Type: String
+    Description: ARN da Role IAM que o Step Functions usará para executar a State Machine.
+  ValidarSolicitacaoLambdaArn:
+    Type: String
+    Description: ARN da função Lambda para ValidarSolicitacao.
+  ChecarSaldoLambdaArn:
+    Type: String
+    Description: ARN da função Lambda para ChecarSaldo.
+  DeduzirSaldoLambdaArn:
+    Type: String
+    Description: ARN da função Lambda para DeduzirSaldo.
+  ExecutarPixLambdaArn:
+    Type: String
+    Description: ARN da função Lambda para ExecutarPix.
+  EstornarSaldoLambdaArn:
+    Type: String
+    Description: ARN da função Lambda para EstornarSaldo.
+  NotificarClienteLambdaArn:
+    Type: String
+    Description: ARN da função Lambda para NotificarCliente.
+  RegistrarFalhaLambdaArn:
+    Type: String
+    Description: ARN da função Lambda para RegistrarFalha.
+  RegistrarTransacaoLambdaArn:
+    Type: String
+    Description: ARN da função Lambda para RegistrarTransacao.
+
+Resources:
+  StateMachinePixWorkflow: # Renomeado para ser mais descritivo
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      Definition:
+        Comment: 'Fluxo de Transação (Ex: Pix) Orquestrado pelo AWS Step Functions'
+        StartAt: ValidarSolicitacao
+        States:
+          ValidarSolicitacao:
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::lambda:invoke'
+            Parameters:
+              FunctionName: !Ref ValidarSolicitacaoLambdaArn
+              Payload.$: '$'
+            Next: ChecarSaldo
+            Catch:
+              - ErrorEquals:
+                  - States.ALL
+                Next: RegistrarFalha
+          ChecarSaldo:
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::lambda:invoke'
+            Parameters:
+              FunctionName: !Ref ChecarSaldoLambdaArn
+              Payload.$: '$'
+            Next: TemSaldo?
+            Catch:
+              - ErrorEquals:
+                  - States.ALL
+                Next: RegistrarFalha
+          TemSaldo?:
+            Type: Choice
+            Choices:
+              - Variable: $.Payload.saldoSuficiente # Assumindo que o output da Lambda está em Payload
+                BooleanEquals: true
+                Next: DeduzirSaldo
+            Default: RegistrarFalha
+          DeduzirSaldo:
+            Comment: >-
+              Atualizar saldo: Deduz valor da conta interna (reservar ou debitar).
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::lambda:invoke'
+            Parameters:
+              FunctionName: !Ref DeduzirSaldoLambdaArn
+              Payload.$: '$'
+            Next: ExecutarPix
+            Catch:
+              - ErrorEquals:
+                  - States.ALL
+                Next: RegistrarFalha
+          ExecutarPix:
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::lambda:invoke'
+            Parameters:
+              FunctionName: !Ref ExecutarPixLambdaArn
+              Payload.$: '$'
+            Next: ErroNaAPIPix?
+            Catch:
+              - ErrorEquals:
+                  - States.ALL
+                Next: EstornarSaldo
+          ErroNaAPIPix?:
+            Type: Choice
+            Choices:
+              - Variable: $.Payload.erroApiPix # Assumindo que o output da Lambda está em Payload
+                BooleanEquals: true
+                Next: EstornarSaldo
+            Default: NotificarCliente
+          EstornarSaldo:
+            Comment: Estornar o valor debitado, já que o Pix falhou.
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::lambda:invoke'
+            Parameters:
+              FunctionName: !Ref EstornarSaldoLambdaArn
+              Payload.$: '$'
+            Next: RegistrarFalha
+          NotificarCliente:
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::lambda:invoke'
+            Parameters:
+              FunctionName: !Ref NotificarClienteLambdaArn
+              Payload.$: '$'
+            Next: RegistrarTransacao
+          RegistrarFalha:
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::lambda:invoke'
+            Parameters:
+              FunctionName: !Ref RegistrarFalhaLambdaArn
+              Payload.$: '$'
+            Next: RegistrarTransacao
+          RegistrarTransacao:
+            Type: Task
+            Resource: !Sub 'arn:aws:states:::lambda:invoke'
+            Parameters:
+              FunctionName: !Ref RegistrarTransacaoLambdaArn
+              Payload.$: '$'
+            End: true
+      # RoleArn agora usa o parâmetro
+      RoleArn: !Ref StateMachineRoleArn
+      StateMachineName: PixTransactionWorkflow
+      StateMachineType: STANDARD
+      EncryptionConfiguration:
+        Type: AWS_OWNED_KEY
+      LoggingConfiguration:
+        Level: 'OFF'
+        IncludeExecutionData: false
+
+Outputs:
+  StateMachineArn:
+    Description: "O ARN da AWS Step Functions State Machine."
+    Value: !Ref StateMachinePixWorkflow
+  StateMachineName:
+    Description: "O nome da AWS Step Functions State Machine."
+    Value: !GetAtt StateMachinePixWorkflow.Name
