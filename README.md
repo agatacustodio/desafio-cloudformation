@@ -1,4 +1,4 @@
-# Pix Transaction Workflow - AWS CloudFormation
+# Cash Out via Pix - Workflow Automatizado com AWS CloudFormation
 
 Este repositório contém um template AWS CloudFormation que define uma **Máquina de Estados (Step Functions)** para orquestrar o fluxo de transação financeira de um Cash Out via Pix.
 
