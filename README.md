@@ -49,6 +49,18 @@ chmod +x scripts/deploy.sh
 ./scripts/deploy.sh
 ```
 
+##  AWS CloudFormation vs Terraform
+
+
+| Característica | **AWS CloudFormation** | **Terraform** |
+|----------------|------------------------|----------------|
+| **Provedor** | Exclusivo da AWS | Multicloud (AWS, Azure, GCP etc.) |
+| **Linguagem** | YAML ou JSON | HCL (HashiCorp Configuration Language) |
+| **Gerenciamento de estado** | Automático pela AWS | Armazenado localmente ou em repositório remoto |
+| **Integração com AWS** | Nativa | Via APIs externas |
+| **Custos** | Gratuito (paga-se apenas pelos recursos criados) | Gratuito (open-source) |
+| **Curva de aprendizado** | Mais simples para quem usa só AWS | Mais flexível, mas exige mais configuração |
+
 ## Insights
 O uso do AWS CloudFormation oferece três grandes vantagens:
 
