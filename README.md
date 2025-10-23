@@ -47,3 +47,13 @@ Use o script de deploy para implantar a State Machine via AWS CloudFormation:
 ```bash
 chmod +x scripts/deploy.sh
 ./scripts/deploy.sh
+```
+
+## Insights
+O uso do AWS CloudFormation oferece três grandes vantagens:
+
+1.  **Infraestrutura como Código:** O template atua como a **fonte única da verdade**, permitindo o **controle de versão** da infraestrutura (como código) para maior transparência e rastreabilidade das alterações.
+2.  **Natureza Declarativa:** Simplifica a implantação, pois o CFN se encarrega do "como" (ordem, dependências), permitindo que você se concentre apenas em **declarar "o quê"** deve ser criado.
+3.  **Gerenciamento do Ciclo de Vida e Rollback:** Garante a **segurança** da implantação. Em caso de qualquer falha, o CFN realiza um **rollback automático** para o último estado funcional conhecido, mantendo a consistência do sistema.
+
+Além disso, o uso de **Parâmetros** torna os templates **reutilizáveis** em diferentes ambientes (Dev/Prod) ou contas.
